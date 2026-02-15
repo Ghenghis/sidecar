@@ -2,6 +2,24 @@
 
 All notable changes to sidecar are documented here.
 
+## [Unreleased]
+
+### Features
+
+- **Windows 11 Support**: Native Windows x64 binaries now available
+  - PowerShell and batch installer scripts
+  - Desktop shortcut creation option
+  - WSL2 + tmux integration for interactive workspace features
+  - Core features work natively: file browser, git, conversations, workspace, notes
+  - td-monitor excluded on Windows (requires Unix-specific file locking)
+  - Windows-specific file manager integration (Explorer)
+
+### Documentation
+
+- Added Windows installation instructions to README
+- Updated requirements section to clarify platform support
+- Added Windows-specific tmux installation guidance
+
 ## [v0.72.0] - 2026-02-14
 
 ### Dependencies

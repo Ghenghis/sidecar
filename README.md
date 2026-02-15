@@ -28,11 +28,34 @@ This builds from source and avoids macOS Gatekeeper warnings.
 curl -fsSL https://raw.githubusercontent.com/marcus/sidecar/main/scripts/setup.sh | bash
 ```
 
+### Windows 11
+
+**PowerShell (recommended):**
+```powershell
+irm https://raw.githubusercontent.com/marcus/sidecar/main/scripts/install-windows.ps1 | iex
+```
+
+Or download and run:
+```powershell
+# Download installer
+Invoke-WebRequest -Uri https://raw.githubusercontent.com/marcus/sidecar/main/scripts/install-windows.ps1 -OutFile install-sidecar.ps1
+
+# Run with options
+.\install-sidecar.ps1 -CreateShortcut
+```
+
+**Batch file:**
+```cmd
+curl -O https://raw.githubusercontent.com/marcus/sidecar/main/scripts/install-windows.bat
+install-windows.bat
+```
+
 **More options:** [Binary downloads](https://github.com/marcus/sidecar/releases) · [Manual install](docs/getting-started.md)
 
 ## Requirements
 
-- macOS, Linux, or WSL
+- **macOS/Linux**: Native support
+- **Windows 11**: Native support (WSL2 + tmux required for interactive workspace features)
 - Go 1.21+ (only if building from source)
 
 ## Quick Start
@@ -230,8 +253,8 @@ See [Theme Creation Skill](.claude/skills/create-theme/SKILL.md) for custom them
 
 | Key | Action                  |
 | --- | ----------------------- |
-| `n` | Create new workspace     |
-| `D` | Delete workspace         |
+| `n` | Create new workspace    |
+| `D` | Delete workspace        |
 | `a` | Launch/attach agent     |
 | `t` | Link/unlink TD task     |
 | `m` | Start merge workflow    |

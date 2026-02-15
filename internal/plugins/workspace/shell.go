@@ -115,6 +115,8 @@ func getTmuxInstallInstructions() string {
 		return "brew install tmux"
 	case "linux":
 		return "sudo apt install tmux  # or: sudo dnf install tmux"
+	case "windows":
+		return "Install WSL2 and tmux:\n  wsl --install\n  wsl -- sudo apt update && sudo apt install -y tmux"
 	default:
 		return "Install tmux from your package manager"
 	}
@@ -462,6 +464,7 @@ func (p *Plugin) restoreShellDisplayNames() {
 		_ = state.SetWorkspaceState(p.ctx.ProjectRoot, wtState)
 	}
 }
+
 // nextShellIndex returns the next available shell index based on existing sessions.
 func (p *Plugin) nextShellIndex() int {
 	projectName := filepath.Base(p.ctx.WorkDir)

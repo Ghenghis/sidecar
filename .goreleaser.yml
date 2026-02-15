@@ -10,30 +10,112 @@ builds:
     goos:
       - darwin
       - linux
+      - windows
     goarch:
       - amd64
       - arm64
+    # Windows arm64 requires Go 1.22+ which we have
+    ignore:
+      - goos: windows
+        goarch: arm64
+        # Windows arm64 has limited support, but we'll try to build it
 
 archives:
-  - formats:
-      - tar.gz
+  - format_overrides:
+      - goos: windows
+        format: zip
     name_template: >-
       {{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}
     files:
       - README.md
       - CHANGELOG.md
+      - LICENSE
+      - src: scripts/install-windows.ps1
+        dst: install-windows.ps1
+        strip_parent: true
+        info:
+          owner: root
+          group: root
+          mode: 0755
+      - src: scripts/install-windows.bat
+        dst: install-windows.bat
+        strip_parent: true
+        info:
+          owner: root
+          group: root
+          mode: 0755
+
+release:
+  # Create GitHub release with all artifacts
+  github:
+    owner: Ghenghis
+    name: sidecar
+  # Include release notes from CHANGELOG
+  mode: replace
+  # Publish release immediately
+  draft: false
+  # Header for the release notes
+  header: |
+    ## Sidecar {{ .Version }}
+    
+    ### Installation
+    
+    **macOS (Homebrew):**
+    ```bash
+    brew install marcus/tap/sidecar
+    ```
+    
+    **Linux:**
+    ```bash
+    curl -fsSL https://raw.githubusercontent.com/marcus/sidecar/main/scripts/setup.sh | bash
+    ```
+    
+    **Windows 11:**
+    ```powershell
+    irm https://raw.githubusercontent.com/marcus/sidecar/main/scripts/install-windows.ps1 | iex
+    ```
+    
+    Or download the `.zip` file below and extract manually.
+  # Footer with additional info
+  footer: |
+    ### Checksums
+    
+    See `checksums.txt` for SHA256 checksums of all artifacts.
+    
+    ### Verifying Downloads
+    
+    ```bash
+    sha256sum -c checksums.txt
+    ```
 
 checksum:
   name_template: checksums.txt
+  algorithm: sha256
 
 changelog:
   sort: asc
+  use: github
   filters:
     exclude:
       - "^docs:"
       - "^test:"
       - "^ci:"
       - "^chore:"
+  groups:
+    - title: Features
+      regexp: "^feat[:\\(]"
+      order: 0
+    - title: Bug Fixes
+      regexp: "^fix[:\\(]"
+      order: 1
+    - title: Documentation
+      regexp: "^docs[:\\(]"
+      order: 2
+    - title: Dependencies
+      regexp: "^(deps|build)[:\\(]"
+      order: 3
+    - title: Other
+      order: 999
 
 # Note: Homebrew formula is manually maintained in marcus/homebrew-tap
 # to build from source (avoids Gatekeeper warnings on macOS)

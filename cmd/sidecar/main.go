@@ -29,12 +29,6 @@ import (
 	"github.com/marcus/sidecar/internal/features"
 	"github.com/marcus/sidecar/internal/keymap"
 	"github.com/marcus/sidecar/internal/plugin"
-	"github.com/marcus/sidecar/internal/plugins/conversations"
-	"github.com/marcus/sidecar/internal/plugins/filebrowser"
-	"github.com/marcus/sidecar/internal/plugins/gitstatus"
-	"github.com/marcus/sidecar/internal/plugins/notes"
-	"github.com/marcus/sidecar/internal/plugins/tdmonitor"
-	"github.com/marcus/sidecar/internal/plugins/workspace"
 	"github.com/marcus/sidecar/internal/state"
 	"github.com/marcus/sidecar/internal/styles"
 	"github.com/marcus/sidecar/internal/theme"
@@ -167,28 +161,8 @@ func main() {
 	// Create plugin registry
 	registry := plugin.NewRegistry(pluginCtx)
 
-	// Register plugins (order determines tab order)
-	// TD plugin registers its bindings dynamically via p.ctx.Keymap
-	if err := registry.Register(tdmonitor.New()); err != nil {
-		logger.Warn("failed to register tdmonitor plugin", "err", err)
-	}
-	if err := registry.Register(gitstatus.New()); err != nil {
-		logger.Warn("failed to register gitstatus plugin", "err", err)
-	}
-	if err := registry.Register(filebrowser.New()); err != nil {
-		logger.Warn("failed to register filebrowser plugin", "err", err)
-	}
-	if err := registry.Register(conversations.New()); err != nil {
-		logger.Warn("failed to register conversations plugin", "err", err)
-	}
-	if err := registry.Register(workspace.New()); err != nil {
-		logger.Warn("failed to register workspace plugin", "err", err)
-	}
-	if features.IsEnabled("notes_plugin") {
-		if err := registry.Register(notes.New()); err != nil {
-			logger.Warn("failed to register notes plugin", "err", err)
-		}
-	}
+	// Register plugins (platform-specific implementation in plugins_unix.go / plugins_windows.go)
+	registerPlugins(registry, logger)
 
 	// Apply user keymap overrides
 	for key, cmdID := range cfg.Keymap.Overrides {
