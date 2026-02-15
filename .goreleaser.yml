@@ -62,7 +62,7 @@ archives:
 release:
   # Create GitHub release with all artifacts
   github:
-    owner: marcus
+    owner: Ghenghis
     name: sidecar
   # Include release notes from CHANGELOG
   mode: replace
