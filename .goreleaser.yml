@@ -21,29 +21,9 @@ builds:
         # Windows arm64 has limited support, but we'll try to build it
 
 archives:
-  # Unix archives use tar.gz
-  - id: unix
-    formats:
-      - tar.gz
-    name_template: >-
-      {{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}
-    files:
-      - README.md
-      - CHANGELOG.md
-      - LICENSE
-      - src: scripts/install-windows.ps1
-        dst: install-windows.ps1
-        strip_parent: true
-    builds_info:
-      group: unix
-    format_overrides:
+  - format_overrides:
       - goos: windows
         format: zip
-
-  # Windows archives use zip and include installer scripts
-  - id: windows
-    formats:
-      - zip
     name_template: >-
       {{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}
     files:
@@ -53,11 +33,17 @@ archives:
       - src: scripts/install-windows.ps1
         dst: install-windows.ps1
         strip_parent: true
+        info:
+          owner: root
+          group: root
+          mode: 0755
       - src: scripts/install-windows.bat
         dst: install-windows.bat
         strip_parent: true
-    builds_info:
-      group: windows
+        info:
+          owner: root
+          group: root
+          mode: 0755
 
 release:
   # Create GitHub release with all artifacts
