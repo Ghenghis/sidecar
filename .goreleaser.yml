@@ -14,28 +14,124 @@ builds:
     goarch:
       - amd64
       - arm64
+    # Windows arm64 requires Go 1.22+ which we have
+    ignore:
+      - goos: windows
+        goarch: arm64
+        # Windows arm64 has limited support, but we'll try to build it
 
 archives:
-  - formats:
+  # Unix archives use tar.gz
+  - id: unix
+    formats:
       - tar.gz
+    name_template: >-
+      {{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}
+    files:
+      - README.md
+      - CHANGELOG.md
+      - LICENSE
+      - src: scripts/install-windows.ps1
+        dst: install-windows.ps1
+        strip_parent: true
+    builds_info:
+      group: unix
+    format_overrides:
+      - goos: windows
+        format: zip
+
+  # Windows archives use zip and include installer scripts
+  - id: windows
+    formats:
       - zip
     name_template: >-
       {{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}
     files:
       - README.md
       - CHANGELOG.md
+      - LICENSE
+      - src: scripts/install-windows.ps1
+        dst: install-windows.ps1
+        strip_parent: true
+      - src: scripts/install-windows.bat
+        dst: install-windows.bat
+        strip_parent: true
+    builds_info:
+      group: windows
+
+release:
+  # Create GitHub release with all artifacts
+  github:
+    owner: marcus
+    name: sidecar
+  # Include release notes from CHANGELOG
+  mode: replace
+  # Draft release for review before publishing
+  draft: true
+  # Allow users to discuss the release
+  discussion_category_name: General
+  # Header for the release notes
+  header: |
+    ## Sidecar {{ .Version }}
+    
+    ### Installation
+    
+    **macOS (Homebrew):**
+    ```bash
+    brew install marcus/tap/sidecar
+    ```
+    
+    **Linux:**
+    ```bash
+    curl -fsSL https://raw.githubusercontent.com/marcus/sidecar/main/scripts/setup.sh | bash
+    ```
+    
+    **Windows 11:**
+    ```powershell
+    irm https://raw.githubusercontent.com/marcus/sidecar/main/scripts/install-windows.ps1 | iex
+    ```
+    
+    Or download the `.zip` file below and extract manually.
+  # Footer with additional info
+  footer: |
+    ### Checksums
+    
+    See `checksums.txt` for SHA256 checksums of all artifacts.
+    
+    ### Verifying Downloads
+    
+    ```bash
+    sha256sum -c checksums.txt
+    ```
 
 checksum:
   name_template: checksums.txt
+  algorithm: sha256
 
 changelog:
   sort: asc
+  use: github
   filters:
     exclude:
       - "^docs:"
       - "^test:"
       - "^ci:"
       - "^chore:"
+  groups:
+    - title: Features
+      regexp: "^feat[:\\(]"
+      order: 0
+    - title: Bug Fixes
+      regexp: "^fix[:\\(]"
+      order: 1
+    - title: Documentation
+      regexp: "^docs[:\\(]"
+      order: 2
+    - title: Dependencies
+      regexp: "^(deps|build)[:\\(]"
+      order: 3
+    - title: Other
+      order: 999
 
 # Note: Homebrew formula is manually maintained in marcus/homebrew-tap
 # to build from source (avoids Gatekeeper warnings on macOS)

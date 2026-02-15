@@ -4,9 +4,18 @@ on:
   push:
     tags:
       - "v*"
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to release (e.g., v0.73.0)'
+        required: true
+        type: string
 
 permissions:
   contents: write
+  packages: write
+  pages: write
+  id-token: write
 
 jobs:
   goreleaser:
@@ -30,6 +39,14 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           HOMEBREW_TAP_TOKEN: ${{ secrets.HOMEBREW_TAP_TOKEN }}
+
+      - name: Upload Windows Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-artifacts
+          path: |
+            dist/*_windows_*.zip
+            dist/checksums.txt
 
   update-homebrew-tap:
     needs: goreleaser
